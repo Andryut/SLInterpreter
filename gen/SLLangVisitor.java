@@ -1,7 +1,8 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
+import java.util.ArrayList;
 
 public class SLLangVisitor<T> extends SLBaseVisitor<T> {
     HashMap<String, Object> table = new HashMap<>();
@@ -103,22 +104,32 @@ public class SLLangVisitor<T> extends SLBaseVisitor<T> {
     public T visitId_f(SLParser.Id_fContext ctx) {
         if (ctx.id() != null) {
             var id = (String) visitId(ctx.id());
-            var id_complement_stack = (Stack) visitId_complement(ctx.id_complement());
-            id_complement_stack.push(id);
-            var variable = (Variable) table.get(id_complement_stack.pop());
-            var register_type = (RegisterType) variable.getType();
-            while (!id_complement_stack.empty()){
-                var structure = (HashMap) register_type.getStructure();
-                var new_element = structure.get(id_complement_stack.pop());
-                if ( new_element instanceof RegisterType ){
-                    register_type = (RegisterType) new_element;
-                } else {
-                    return (T) new_element;
-                }
+            var id_complement_list = (List) visitId_complement(ctx.id_complement());
+            if ( id_complement_list.size() == 0 ){
+                return  (T) table.get(id);
+            } else {
+                System.exit(-1);
             }
-            return (T) table.get(id_complement_stack);
         } else {
-            return (T) "";
+            var func = (String) visitFunc(ctx.func());
+            var parameter_list = (List) visitParameter(ctx.parameter());
+            switch (func){
+                case "pcount":
+                    System.out.println(parameter_list.size());
+                    break;
+                case "imprimir":
+                    for (Object parameter : parameter_list){
+                        System.out.println(parameter);
+                    }
+                    break;
+                case "cls":
+                    try {
+                        Runtime.getRuntime().exec("cls");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    break;
+            }
         }
     }
 
@@ -130,7 +141,7 @@ public class SLLangVisitor<T> extends SLBaseVisitor<T> {
     @Override
     public T visitP_sep(SLParser.P_sepContext ctx) {
         if ( ctx.param() == null ){
-            return (T) new Stack<>() ;
+            return (T) new ArrayList<>() ;
         }
         return visitParam(ctx.param());
     }
@@ -166,18 +177,18 @@ public class SLLangVisitor<T> extends SLBaseVisitor<T> {
     public T visitId_complement(SLParser.Id_complementContext ctx) {
         if (ctx.id() != null) {
             var id = (String) visitId(ctx.id());
-            var id_extraction_stack = (Stack) visitId_extraction(ctx.id_extraction());
-            id_extraction_stack.push(id);
+            var id_extraction_stack = (List) visitId_extraction(ctx.id_extraction());
+            id_extraction_stack.add(id);
             return (T) id_extraction_stack;
         } else if (ctx.parameter() != null) {
-            return (T) visitParameter(ctx.parameter());
+            return (T) (List) visitParameter(ctx.parameter());
         } else if (ctx.p_exp() != null) {
             var p_exp = visitP_exp(ctx.p_exp());
             var vec_sep_list = (List) visitVec_sep(ctx.vec_sep());
             vec_sep_list.add(p_exp);
             return (T) vec_sep_list;
         } else {
-            return (T) "";
+            return (T) new ArrayList<>();
         }
     }
 
@@ -185,15 +196,15 @@ public class SLLangVisitor<T> extends SLBaseVisitor<T> {
     public T visitId_extraction(SLParser.Id_extractionContext ctx) {
         if (ctx.id() != null) {
             var id = (T) visitId(ctx.id());
-            var id_extraction_stack = (Stack) visitId_extraction(ctx.id_extraction());
-            id_extraction_stack.push(id);
+            var id_extraction_stack = (ArrayList) visitId_extraction(ctx.id_extraction());
+            id_extraction_stack.add(id);
             return (T) id_extraction_stack;
         } else if (ctx.p_exp() != null) {
             var p_expr = (String) visitP_exp(ctx.p_exp());
             var vec_sep = visitVec_sep(ctx.vec_sep());
             return (T) "";
         } else {
-            return (T) new Stack<T>();
+            return (T) new ArrayList<T>();
         }
     }
 
