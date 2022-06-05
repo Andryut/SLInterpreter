@@ -14,6 +14,14 @@ public class Variable<T> {
         this.value = value;
     }
 
+    public Object getType() {
+        return type;
+    }
+
+    public void setType(Object type) {
+        this.type = type;
+    }
+
     @Override
     public String toString() {
         return "Variable{" +

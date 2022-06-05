@@ -4,13 +4,23 @@ var
     a : cadena
     r, i : registro {
             a : cadena
-            b : cadena
+            b : registro {
+                c : cadena
+                d : cadena
+            }
         }
 tipos
     re : registro {
         a : cadena
         b : cadena
     }
-    a : cadena
+    a : caden
 inicio
+    r.b.c = "hola"
+    si ( r.b.c )
+    {
+        a = "hola"
+    sino
+        a = "adios"
+    }
 fin

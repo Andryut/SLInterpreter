@@ -1,36 +1,36 @@
 public class Op_Term<T> {
-    private String op;
-    private Object op_term;
-
-    public String getOp() {
-        return op;
-    }
-
-    public void setOp(String op) {
-        this.op = op;
-    }
+    private T op;
+    private T term;
 
     public Op_Term() {
     }
 
-    public Op_Term(String op, Object op_term) {
+    public Op_Term(T op, T term) {
         this.op = op;
-        this.op_term = op_term;
+        this.term = term;
     }
 
-    public Object getOp_term() {
-        return op_term;
+    public T getOp() {
+        return op;
     }
 
-    public void setOp_term(Object op_term) {
-        this.op_term = op_term;
+    public void setOp(T op) {
+        this.op = op;
+    }
+
+    public T getTerm() {
+        return term;
+    }
+
+    public void setTerm(T term) {
+        this.term = term;
     }
 
     @Override
     public String toString() {
         return "Expresion{" +
                 "op=" + op +
-                ", op_term=" + op_term +
+                ", term=" + term +
                 '}';
     }
 }
