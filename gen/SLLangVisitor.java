@@ -1,5 +1,7 @@
 import java.util.*;
 
+import static java.lang.Double.valueOf;
+
 public class SLLangVisitor<T> extends SLBaseVisitor<T>{
     HashMap<String,Object> table = new HashMap<>();
 
@@ -134,4 +136,60 @@ public class SLLangVisitor<T> extends SLBaseVisitor<T>{
         }
         return visitLiteral(ctx.literal());
     }
+
+    //####################################################################
+    //################################ CICLOS ###########################
+    //####################################################################
+
+    @Override public T visitFrom(SLParser.FromContext ctx) {
+
+        table.put(ctx.id().getText(), visitP_exp(ctx.p_exp(0)));
+        int times = (int)(double)(Double)visitP_exp(ctx.p_exp(1));
+
+        int step = 1;
+
+        // search for step
+        if(ctx.from_step().p_exp() != null){
+            step = (int)(double)(Double)visitP_exp(ctx.from_step().p_exp());
+        }
+
+        for(int i =((Integer) table.get(ctx.id().getText())); i <= times ; i = i+step){
+            visitRep_body(ctx.from_step().rep_body());
+            table.replace(ctx.id().getText(), i + step );
+        }
+        table.remove(ctx.id().getText());
+
+        return null;
+    }
+
+    @Override public T visitUntil(SLParser.UntilContext ctx) {
+
+        var boolCond = true;
+
+        do{
+            visitMain_sentence(ctx.until_program().main_sentence());
+            // search for condition and update it
+            if(ctx.until_program().condition() != null){
+                boolCond = ((Boolean) visitCondition(ctx.until_program().condition()));
+            }
+        }while(boolCond);
+
+        return null;
+    }
+
+    @Override public T visitWhile_stat(SLParser.While_statContext ctx) {
+
+        var boolCond = true;
+
+        while(boolCond){
+            visitRep_body(ctx.rep_body());
+            // search for condition and update it
+            if(ctx.condition() != null){
+                boolCond = ((Boolean) visitCondition(ctx.condition()));
+            }
+        };
+
+        return null;
+    }
+
 }
