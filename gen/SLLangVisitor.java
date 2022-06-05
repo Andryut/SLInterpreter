@@ -1,4 +1,6 @@
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class SLLangVisitor<T> extends SLBaseVisitor<T>{
     HashMap<String,Object> table = new HashMap<>();
@@ -6,6 +8,43 @@ public class SLLangVisitor<T> extends SLBaseVisitor<T>{
     @Override public T visitDec_types(SLParser.Dec_typesContext ctx) {
         table.put(ctx.id().getText(), visitStructured_type(ctx.structured_type()));
         return visitDec_types_continue(ctx.dec_types_continue());
+    @Override
+    public T visitOp(SLParser.OpContext ctx) {
+        return (T) ctx.getText();
+    }
+
+    @Override
+    public T visitP_exp(SLParser.P_expContext ctx) {
+        var list = (List) visitOp_term(ctx.op_term());
+
+        list.add(visitTerm(ctx.term()));
+
+        return (T)  list;
+    }
+
+    @Override
+    public T visitOp_term(SLParser.Op_termContext ctx) {
+        if( ctx.op_term() == null ) {
+            return (T) new Op_Term();
+        }
+        var op = (T) ctx.op();
+        var term =
+
+    }
+
+    @Override
+    public T visitTerm(SLParser.TermContext ctx) {
+        if ( ctx.p_exp() != null ){
+            return visitP_exp(ctx.p_exp());
+        } else if (ctx.id_f() != null ) {
+            return visitId_f(ctx.id_f());
+        } else if (ctx.literal() != null ) {
+            return visitLiteral(ctx.literal());
+        } else if (ctx.unop() != null ) {
+            return (visitUnop(ctx.unop()));
+        } else {
+            return visitVector_value(ctx.vector_value());
+        }
     }
 
     @Override public T visitRegister_members(SLParser.Register_membersContext ctx) {
